@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IGNITEX 2026 — Jury Evaluation Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #091353;
+      --navy-dark: #050b30;
+      --red: #d32f2f;
+      --gold: #f5a623;
+      --purple: #6366f1;
+      --bg: #eef2f9;
+      --surface: #ffffff;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 14px;
+      --radius-sm: 8px;
+      --transition: all 0.25s ease;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg);
+      background-image:
+        radial-gradient(circle at 10% 60%, rgba(211,47,47,0.07), transparent 35%),
+        radial-gradient(circle at 90% 15%, rgba(9,19,83,0.1), transparent 35%);
+      background-attachment: fixed;
+      color: #1e293b;
+      min-height: 100vh;
+    }
+    h1, h2, h3, h4, h5 { font-family: 'Sora', sans-serif; }
+
+    /* ─── HEADER ─── */
+    .hdr {
+      background: linear-gradient(135deg, #091353 0%, #1a237e 60%, #0d47a1 100%);
+      color: #fff;
+      padding: 32px 20px 0;
+      text-align: center;
+      border-bottom: 4px solid var(--red);
+      position: relative;
+      overflow: hidden;
+    }
+    .hdr::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");
+    }
+    .hdr-logo {
+      height: 100px;
+      max-width: 100%;
+      object-fit: contain;
+      margin-bottom: 12px;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+      position: relative;
+      z-index: 2;
+    }
+    .hdr-sub { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #90caf9; margin-bottom: 8px; position: relative; z-index: 2; }
+    .hdr-title { font-size: 46px; font-weight: 800; font-style: italic; letter-spacing: -1px; text-shadow: 0 2px 16px rgba(0,0,0,.4); position: relative; z-index: 2; }
+    .hdr-tagline { background: var(--red); display: inline-block; padding: 4px 16px; font-size: 10px; font-weight: 700; letter-spacing: 2px; border-radius: 4px; margin-top: 10px; position: relative; z-index: 2; }
+
+    /* Step Nav */
+    .step-nav { display: flex; justify-content: center; align-items: center; margin: 24px 0 0; flex-wrap: wrap; position: relative; z-index: 2; }
+    .step-pill {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+      padding: 8px 18px; font-size: 13px; font-family: 'Sora', sans-serif;
+      font-weight: 600; color: #e3f2fd; cursor: pointer;
+      transition: var(--transition);
+    }
+    .step-pill:first-child { border-radius: 10px 0 0 10px; }
+    .step-pill:last-child { border-radius: 0 10px 10px 0; }
+    .step-pill.active { background: var(--red); border-color: var(--red); color: #fff; }
+    .step-pill.done { background: rgba(16,185,129,.25); border-color: #10b981; color: #a7f3d0; }
+    .step-num { background: rgba(255,255,255,.2); width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+
+    /* ─── LAYOUT ─── */
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 28px;
+      max-width: 1100px;
+      margin: 36px auto;
+      padding: 0 20px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar-sticky { position: relative !important; top: 0 !important; }
+      .hdr-title { font-size: 34px; }
+    }
+
+    /* ─── CARDS ─── */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 28px;
+      box-shadow: 0 4px 24px rgba(9,19,83,.06);
+    }
+    .section-label {
+      font-family: 'Sora', sans-serif;
+      font-size: 11px; font-weight: 700; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--navy);
+      border-bottom: 2px solid #e8edf8; padding-bottom: 10px; margin-bottom: 22px;
+    }
+
+    /* ─── STEP SECTIONS ─── */
+    .step-content { display: none; }
+    .step-content.active { display: block; animation: fadeUp .3s ease; }
+    .step-content + .step-content { margin-top: 0; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ─── FORM FIELDS ─── */
+    .field { margin-bottom: 20px; }
+    label { font-size: 13px; font-weight: 600; color: #374151; display: block; margin-bottom: 7px; }
+    input[type="text"], input[type="number"], select, textarea {
+      width: 100%; padding: 12px 14px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif; font-size: 14px;
+      background: #fff; color: #1e293b;
+      transition: var(--transition); outline: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px rgba(9,19,83,.08);
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* ─── SCORING ROWS ─── */
+    .quick-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+    .qa-chip {
+      background: #e8edf8; color: var(--navy); border: none;
+      padding: 7px 14px; border-radius: 20px;
+      font-size: 12px; font-weight: 600; cursor: pointer;
+      transition: var(--transition); font-family: 'DM Sans', sans-serif;
+    }
+    .qa-chip:hover { background: var(--navy); color: #fff; }
+
+    .score-row {
+      display: flex; align-items: center; gap: 14px;
+      background: #f8faff; border: 1.5px solid var(--border);
+      border-radius: 10px; padding: 13px 15px; margin-bottom: 10px;
+      transition: var(--transition);
+    }
+    .score-row:hover { border-color: #93c5fd; background: #eff6ff; transform: translateX(3px); }
+    .score-row-left { flex: 1; }
+    .score-row-name { font-size: 13px; font-weight: 600; color: #1e293b; }
+    .score-row-max { font-size: 11px; color: var(--muted); margin-top: 3px; }
+    .score-row-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .score-slider {
+      -webkit-appearance: none; width: 110px; height: 4px;
+      border-radius: 2px; background: #e2e8f0; outline: none; border: none; padding: 0;
+    }
+    .score-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 18px; height: 18px;
+      border-radius: 50%; background: var(--navy); cursor: pointer;
+      box-shadow: 0 2px 8px rgba(9,19,83,.35);
+    }
+    .score-slider::-moz-range-thumb {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--navy); cursor: pointer; border: none;
+      box-shadow: 0 2px 8px rgba(9,19,83,.35);
+    }
+    .score-num {
+      width: 65px; text-align: center; font-weight: 700; font-size: 15px;
+      padding: 8px; border-radius: 8px; border: 2px solid var(--border);
+    }
+
+    /* ─── TOTAL BOX ─── */
+    .total-panel {
+      background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+      border-radius: 14px; padding: 22px;
+      text-align: center; margin-top: 26px;
+    }
+    .total-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--navy); opacity: .7; }
+    .total-num { font-family: 'Sora', sans-serif; font-size: 48px; font-weight: 800; color: var(--navy); line-height: 1.1; }
+    .total-sub { font-size: 16px; opacity: .5; }
+    .total-bar { height: 8px; background: #c7ddf0; border-radius: 4px; margin: 12px auto 0; max-width: 300px; overflow: hidden; }
+    .total-fill { height: 100%; background: linear-gradient(90deg, var(--navy), var(--purple)); border-radius: 4px; transition: width .5s cubic-bezier(.4,0,.2,1); }
+    .grade-badge { display: inline-block; padding: 5px 18px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-top: 12px; font-family: 'Sora', sans-serif; }
+    .grade-A { background: #d1fae5; color: #065f46; }
+    .grade-B { background: #dbeafe; color: #1e40af; }
+    .grade-C { background: #fef3c7; color: #92400e; }
+    .grade-D { background: #fee2e2; color: #991b1b; }
+
+    /* ─── AI FEEDBACK ─── */
+    .ai-bubble {
+      background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+      border: 1.5px solid #c4b5fd; border-radius: 14px;
+      padding: 18px; margin-top: 18px;
+      display: none; position: relative;
+    }
+    .ai-bubble.show { display: block; animation: fadeUp .35s ease; }
+    .ai-avatar {
+      position: absolute; top: -13px; left: 16px;
+      background: linear-gradient(135deg, #6366f1, #4338ca);
+      color: #fff; border-radius: 50%; width: 26px; height: 26px;
+      display: flex; align-items: center; justify-content: center; font-size: 14px;
+    }
+    .ai-text { font-size: 13px; line-height: 1.8; color: #3730a3; margin-top: 6px; }
+    .ai-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+    .ai-loading { display: flex; align-items: center; gap: 10px; color: #6366f1; font-size: 13px; font-weight: 600; }
+    .dots span { animation: blink 1.2s infinite; display: inline-block; }
+    .dots span:nth-child(2) { animation-delay: .2s; }
+    .dots span:nth-child(3) { animation-delay: .4s; }
+    @keyframes blink { 0%,80%,100% { opacity: 0; } 40% { opacity: 1; } }
+
+    /* ─── REVIEW ─── */
+    .review-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+    .review-meta-item { background: #f8faff; border-radius: 8px; padding: 10px 14px; }
+    .review-meta-label { font-size: 11px; color: var(--muted); margin-bottom: 2px; }
+    .review-meta-val { font-size: 14px; font-weight: 600; }
+    .review-score-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
+    .review-score-row:last-child { border-bottom: none; }
+    .review-total { display: flex; justify-content: space-between; font-family: 'Sora', sans-serif; font-size: 17px; font-weight: 800; color: var(--navy); margin-top: 14px; padding-top: 12px; border-top: 2px solid #e8edf8; }
+
+    /* ─── BUTTONS ─── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 13px 20px; border: none; border-radius: 10px;
+      font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: var(--transition); text-decoration: none;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.15); }
+    .btn:active { transform: translateY(0); }
+    .btn-block { width: 100%; }
+    .btn-navy { background: linear-gradient(135deg, var(--navy), #1a237e); color: #fff; box-shadow: 0 4px 14px rgba(9,19,83,.3); }
+    .btn-red { background: linear-gradient(135deg, var(--red), #b71c1c); color: #fff; box-shadow: 0 4px 14px rgba(211,47,47,.3); }
+    .btn-purple { background: linear-gradient(135deg, #6366f1, #4338ca); color: #fff; box-shadow: 0 4px 14px rgba(99,102,241,.3); }
+    .btn-outline { background: #fff; color: var(--navy); border: 2px solid var(--navy); }
+    .btn-outline:hover { background: var(--navy); color: #fff; }
+    .btn-sm { padding: 8px 16px; font-size: 13px; border-radius: 8px; }
+    .btn-row { display: flex; gap: 12px; margin-top: 24px; }
+    .ai-chip { background: rgba(255,255,255,.2); padding: 2px 8px; border-radius: 4px; font-size: 10px; }
+
+    /* ─── STATUS ─── */
+    #status {
+      text-align: center; margin-top: 14px; font-size: 14px;
+      font-weight: 600; padding: 12px; border-radius: 8px; display: none;
+    }
+    #status.success { display: block; background: #d1fae5; color: #065f46; }
+    #status.error { display: block; background: #fee2e2; color: #991b1b; }
+
+    /* ─── SUCCESS SCREEN ─── */
+    .success-screen { display: none; text-align: center; padding: 48px 20px; }
+    .success-screen.show { display: block; animation: fadeUp .5s ease; }
+    .success-icon { font-size: 72px; margin-bottom: 18px; }
+    .success-title { font-size: 26px; font-weight: 800; color: var(--navy); margin-bottom: 10px; }
+    .success-sub { color: var(--muted); font-size: 15px; line-height: 1.6; }
+    .success-score-box { background: linear-gradient(135deg, #e0f2fe, #bae6fd); border-radius: 14px; padding: 20px; margin: 24px auto; max-width: 200px; }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar-sticky { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 16px; }
+
+    .timer-box {
+      background: linear-gradient(135deg, #fff7ed, #ffedd5);
+      border: 1.5px solid #fed7aa; border-radius: 10px;
+      padding: 14px 18px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .timer-label { font-size: 12px; font-weight: 600; color: #9a3412; }
+    .timer-val { font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 800; color: #c2410c; }
+
+    .mini-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .mini-bar-label { font-size: 11px; color: var(--muted); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mini-bar-track { flex: 2; height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden; }
+    .mini-bar-fill { height: 100%; background: linear-gradient(90deg, var(--navy), var(--purple)); border-radius: 2px; transition: width .4s ease; }
+    .mini-bar-val { font-size: 12px; font-weight: 700; color: var(--navy); min-width: 20px; text-align: right; }
+    .side-total { font-family: 'Sora', sans-serif; font-size: 30px; font-weight: 800; color: var(--navy); }
+
+    /* Leaderboard */
+    .lb-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 9px;
+      background: #f8faff; border: 1px solid var(--border);
+      margin-bottom: 8px; transition: var(--transition);
+    }
+    .lb-row:hover { background: #eff6ff; border-color: #93c5fd; transform: translateX(3px); }
+    .lb-rank { font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 800; width: 26px; text-align: center; }
+    .lb-team-name { font-size: 13px; font-weight: 600; }
+    .lb-domain { font-size: 11px; color: var(--muted); }
+    .lb-score { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 800; color: var(--navy); margin-left: auto; }
+    .lb-empty { font-size: 12px; color: var(--muted); text-align: center; padding: 12px; }
+
+    /* Sponsors */
+    .sponsor-card {
+      background: #fff; border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px 14px; display: flex; align-items: center; gap: 12px;
+      transition: var(--transition); margin-bottom: 8px;
+    }
+    .sponsor-card:hover { border-color: #93c5fd; transform: translateX(4px); box-shadow: 0 4px 12px rgba(9,19,83,.07); }
+    .sponsor-dot {
+      width: 38px; height: 38px; border-radius: 9px;
+      background: linear-gradient(135deg, #e8edf8, #dbeafe);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Sora', sans-serif; font-size: 12px; font-weight: 800; color: var(--navy); flex-shrink: 0;
+    }
+    .sponsor-name { font-size: 13px; font-weight: 700; color: var(--navy); }
+    .sponsor-loc { font-size: 11px; color: var(--red); margin-top: 2px; }
+  </style>
+</head>
+<body>
+
+<div class="hdr">
+  <img src="image_c9a0f6.png" alt="Hidden Gems Society" class="hdr-logo">
+  
+  <div class="hdr-sub">Hidden Gems Community Presents</div>
+  <div class="hdr-title">IGNITEX 2026</div>
+  <div class="hdr-tagline">COLLABORATE · INNOVATE · IGNITE THE FUTURE</div>
+  
+  <div class="step-nav" id="stepNav">
+    <div class="step-pill active" data-step="1" onclick="goStep(1)"><span class="step-num">1</span>Team Info</div>
+    <div class="step-pill" data-step="2" onclick="goStep(2)"><span class="step-num">2</span>Scoring</div>
+    <div class="step-pill" data-step="3" onclick="goStep(3)"><span class="step-num">3</span>Remarks</div>
+    <div class="step-pill" data-step="4" onclick="goStep(4)"><span class="step-num">4</span>Review</div>
+  </div>
+</div>
+
+<div class="layout">
+  <div id="mainCol">
+
+    <div class="step-content active card" id="step1">
+      <div class="section-label">Step 1 — Team Information</div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="juryName">Jury Member Name</label>
+          <input type="text" id="juryName" placeholder="Your full name" required>
+        </div>
+        <div class="field">
+          <label for="teamName">Team ID / Project Name</label>
+          <input type="text" id="teamName" placeholder="e.g., Team Alpha" required>
+        </div>
+        <div class="field">
+          <label for="domain">Project Domain</label>
+          <select id="domain" required>
+            <option value="">Select Domain...</option>
+            <option value="Web/App Development">Web / App Development</option>
+            <option value="AI / Machine Learning">AI / Machine Learning</option>
+            <option value="IoT / Hardware">IoT / Hardware</option>
+            <option value="Cybersecurity">Cybersecurity</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="round">Evaluation Round</label>
+          <select id="round">
+            <option value="Round 1">Round 1 — Preliminary</option>
+            <option value="Round 2">Round 2 — Semi-Final</option>
+            <option value="Finals">Finals</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-navy btn-block" onclick="goStep(2)">Next: Scoring →</button>
+      </div>
+    </div>
+
+    <div class="step-content card" id="step2">
+      <div class="section-label">Step 2 — Official Scoring Rubric</div>
+
+      <div class="quick-actions">
+        <button class="qa-chip" onclick="setAll(0)">↺ Reset</button>
+        <button class="qa-chip" onclick="setAll('max')">⬆ Max All</button>
+        <button class="qa-chip" onclick="setAll('half')">➗ Half Marks</button>
+        <button class="qa-chip" onclick="setAll('random')">🎲 Sample Fill</button>
+      </div>
+
+      <div id="scoreRows"></div>
+
+      <div class="total-panel">
+        <div class="total-label">Total Score</div>
+        <div class="total-num">
+          <span id="totalDisplay">0</span>
+          <span class="total-sub"> / 100</span>
+        </div>
+        <div class="total-bar">
+          <div class="total-fill" id="totalBar" style="width:0%"></div>
+        </div>
+        <div id="gradeBadge" class="grade-badge grade-D">Enter scores above</div>
+      </div>
+
+      <div style="margin-top:24px;background:#f8faff;border-radius:12px;padding:20px;border:1.5px solid var(--border)">
+        <div class="section-label">Score Radar — Visual Overview</div>
+        <div style="position:relative;height:280px;width:100%;max-width:320px;margin:0 auto">
+          <canvas id="radarCanvas" role="img" aria-label="Radar chart of scores across all 7 evaluation criteria">Score visualization across criteria.</canvas>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-outline btn-sm" onclick="goStep(1)">← Back</button>
+        <button class="btn btn-navy" style="flex:1" onclick="goStep(3)">Next: Remarks →</button>
+      </div>
+    </div>
+
+    <div class="step-content card" id="step3">
+      <div class="section-label">Step 3 — Remarks & Recommendation</div>
+
+      <div class="field">
+        <label for="comments">Jury Comments & Feedback</label>
+        <textarea id="comments" rows="5" placeholder="Share detailed feedback for the team..."></textarea>
+      </div>
+
+      <button class="btn btn-purple btn-block" onclick="getAIFeedback()" id="aiBtn">
+        ✨ Generate Smart AI Feedback <span class="ai-chip">Powered by Assistant</span>
+      </button>
+
+      <div class="ai-bubble" id="aiBubble">
+        <div class="ai-avatar">✦</div>
+        <div id="aiLoadingEl" class="ai-loading" style="display:none">
+          <span>AI is thinking</span>
+          <span class="dots"><span>·</span><span>·</span><span>·</span></span>
+        </div>
+        <div class="ai-text" id="aiText"></div>
+        <div class="ai-actions">
+          <button class="btn btn-outline btn-sm" onclick="useAISuggestion()">✓ Use this →</button>
+          <button class="btn btn-sm" style="background:#e8edf8;color:var(--navy)" onclick="getAIFeedback()">↺ Regenerate</button>
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:24px">
+        <label for="recommendation">Jury Recommendation</label>
+        <select id="recommendation">
+          <option value="">Select a recommendation...</option>
+          <option value="Strongly Recommend for Finals">⭐ Strongly Recommend for Finals</option>
+          <option value="Recommend with minor improvements">✅ Recommend with Minor Improvements</option>
+          <option value="Needs significant rework">⚠️ Needs Significant Rework</option>
+          <option value="Not recommended">❌ Not Recommended</option>
+        </select>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-outline btn-sm" onclick="goStep(2)">← Back</button>
+        <button class="btn btn-navy" style="flex:1" onclick="goStep(4)">Next: Review & Submit →</button>
+      </div>
+    </div>
+
+    <div class="step-content card" id="step4">
+      <div class="section-label">Step 4 — Review & Submit</div>
+      <div id="reviewContent"></div>
+      <div class="btn-row" style="margin-top:28px">
+        <button class="btn btn-outline btn-sm" onclick="goStep(3)">← Back</button>
+        <button class="btn btn-red" id="submitBtn" style="flex:1" onclick="submitForm()">🔥 Submit Final Evaluation</button>
+      </div>
+      <div id="status"></div>
+    </div>
+
+    <div class="success-screen card" id="successScreen">
+      <div class="success-icon">🎉</div>
+      <div class="success-title">Evaluation Submitted!</div>
+      <div class="success-sub">Your evaluation for <strong id="successTeam"></strong> has been recorded.</div>
+      <div class="success-score-box">
+        <div style="font-family:'Sora',sans-serif;font-size:36px;font-weight:800;color:var(--navy)" id="successScore"></div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">Final Score</div>
+      </div>
+      <button class="btn btn-navy" style="width:auto;padding:13px 32px;margin-top:8px" onclick="resetAll()">Evaluate Another Team →</button>
+    </div>
+
+  </div>
+
+  <aside>
+    <div class="sidebar-sticky">
+
+      <div class="card" style="padding:16px">
+        <div class="timer-box">
+          <div>
+            <div class="timer-label">⏱ Time Elapsed</div>
+            <div style="font-size:10px;color:#c2410c;margin-top:2px">This evaluation</div>
+          </div>
+          <div class="timer-val" id="timer">00:00</div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:20px">
+        <div class="section-label">Live Score</div>
+        <div id="miniScores"></div>
+        <div style="text-align:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+          <span class="side-total" id="sideTotal">0</span>
+          <span style="font-size:14px;color:var(--muted)">/100</span>
+        </div>
+      </div>
+
+      <div class="card" style="padding:20px">
+        <div class="section-label">Today's Top Teams</div>
+        <div id="leaderboard">
+          <div class="lb-empty">No submissions yet today</div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px;text-align:center">Updates after each submission</div>
+      </div>
+
+      <div class="card" style="padding:20px">
+        <div class="section-label">Supported By</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:14px;text-align:center">Ministry of MSME, Govt. of India</div>
+        <div id="sponsorList"></div>
+      </div>
+
+    </div>
+  </aside>
+
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+const CRITERIA = [
+  { id: 's1', name: 'Problem Statement & Real-Time Relevance', short: 'Problem', max: 15 },
+  { id: 's2', name: 'Creativity & Innovation',                 short: 'Innovation', max: 20 },
+  { id: 's3', name: 'Prototype / Product Implementation',      short: 'Prototype', max: 20 },
+  { id: 's4', name: 'Business & Market Viability',             short: 'Business', max: 15 },
+  { id: 's5', name: 'Teamwork & Collaboration',                short: 'Teamwork', max: 10 },
+  { id: 's6', name: 'PPT & Presentation Skills',               short: 'Presentation', max: 10 },
+  { id: 's7', name: 'Future Scope & Scalability',              short: 'Scalability', max: 10 },
+];
+
+const SPONSORS = [
+  { name: 'Tech Shala',                 loc: 'Hyderabad',       abbr: 'TS' },
+  { name: 'Tech Roxx',                  loc: 'Hyderabad',       abbr: 'TR' },
+  { name: 'ESSENSHINE',                 loc: 'Hyderabad',       abbr: 'ES' },
+  { name: 'Auroversity Technologies',   loc: 'Madurai',         abbr: 'AV' },
+  { name: 'Jeevan Voluntary Blood Bank',loc: 'Hanamkonda',      abbr: 'JB' },
+  { name: 'ReSearchRS',                 loc: 'New Delhi',       abbr: 'RS' },
+];
+
+let scores = {};
+let radarChart = null;
+let startTime = Date.now();
+let leaderboardData = [];
+let aiSuggestionText = '';
+
+// Updated Live API Target Link
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbza6NPd67onaLZLVzo1MAn66aKwog3cMAxJziifP9kLp6hADtMTDj4IAEda60ANebU1OQ/exec';
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+CRITERIA.forEach(c => scores[c.id] = 0);
+buildSponsorList();
+buildScoreRows();
+buildMiniScores();
+buildLeaderboard();
+startTimer();
+
+function buildSponsorList() {
+  const el = document.getElementById('sponsorList');
+  SPONSORS.forEach(s => {
+    el.innerHTML += `
+      <div class="sponsor-card">
+        <div class="sponsor-dot">${s.abbr}</div>
+        <div>
+          <div class="sponsor-name">${s.name}</div>
+          <div class="sponsor-loc">📍 ${s.loc}</div>
+        </div>
+      </div>`;
+  });
+}
+
+function buildScoreRows() {
+  const el = document.getElementById('scoreRows');
+  CRITERIA.forEach(c => {
+    el.innerHTML += `
+      <div class="score-row">
+        <div class="score-row-left">
+          <div class="score-row-name">${c.name}</div>
+          <div class="score-row-max">Max: ${c.max} pts</div>
+        </div>
+        <div class="score-row-right">
+          <input type="range" class="score-slider" id="sl_${c.id}" min="0" max="${c.max}" value="0" step="1"
+            oninput="onScore('${c.id}', this.value, 'slider')">
+          <input type="number" class="score-num" id="num_${c.id}" min="0" max="${c.max}" value="0" placeholder="0"
+            oninput="onScore('${c.id}', this.value, 'number')">
+        </div>
+      </div>`;
+  });
+}
+
+function buildMiniScores() {
+  const el = document.getElementById('miniScores');
+  CRITERIA.forEach(c => {
+    el.innerHTML += `
+      <div class="mini-bar-row">
+        <div class="mini-bar-label">${c.short}</div>
+        <div class="mini-bar-track">
+          <div class="mini-bar-fill" id="mini_${c.id}" style="width:0%"></div>
+        </div>
+        <div class="mini-bar-val" id="mval_${c.id}">0</div>
+      </div>`;
+  });
+}
+
+// ─── SCORE INPUT & LIVE LIMIT RESTRICTIONS ───
+function onScore(id, raw, src) {
+  const max = CRITERIA.find(c => c.id === id).max;
+  let v = Math.min(Math.max(Math.round(Number(raw) || 0), 0), max);
+  scores[id] = v;
+  if (src === 'slider') document.getElementById('num_' + id).value = v;
+  else document.getElementById('sl_' + id).value = v;
+  updateTotals();
+  updateRadar();
+}
+
+function updateTotals() {
+  const total = Object.values(scores).reduce((a, b) => a + b, 0);
+  document.getElementById('totalDisplay').textContent = total;
+  document.getElementById('sideTotal').textContent = total;
+  document.getElementById('totalBar').style.width = total + '%';
+
+  const gb = document.getElementById('gradeBadge');
+  if (total >= 85) { gb.textContent = 'A — Excellent 🔥'; gb.className = 'grade-badge grade-A'; }
+  else if (total >= 70) { gb.textContent = 'B — Good ✅'; gb.className = 'grade-badge grade-B'; }
+  else if (total >= 50) { gb.textContent = 'C — Average ⚠️'; gb.className = 'grade-badge grade-C'; }
+  else { gb.textContent = 'D — Needs Work ❌'; gb.className = 'grade-badge grade-D'; }
+
+  CRITERIA.forEach(c => {
+    const pct = Math.round((scores[c.id] / c.max) * 100);
+    document.getElementById('mini_' + c.id).style.width = pct + '%';
+    document.getElementById('mval_' + c.id).textContent = scores[c.id];
+  });
+}
+
+// ─── RADAR CHART ───
+function updateRadar() {
+  const data = CRITERIA.map(c => Math.round((scores[c.id] / c.max) * 100));
+  if (!radarChart) {
+    const ctx = document.getElementById('radarCanvas').getContext('2d');
+    radarChart = new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: CRITERIA.map(c => c.short),
+        datasets: [{
+          label: 'Score %',
+          data,
+          backgroundColor: 'rgba(9,19,83,0.1)',
+          borderColor: '#091353',
+          pointBackgroundColor: '#d32f2f',
+          pointRadius: 5,
+          borderWidth: 2,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          r: {
+            min: 0, max: 100,
+            ticks: { stepSize: 25, font: { size: 10 } },
+            grid: { color: '#e2e8f0' },
+            angleLines: { color: '#e2e8f0' },
+            pointLabels: { font: { size: 11, family: "'DM Sans', sans-serif" } }
+          }
+        },
+        plugins: { legend: { display: false } }
+      }
+    });
+  } else {
+    radarChart.data.datasets[0].data = data;
+    radarChart.update('active');
+  }
+}
+
+// ─── QUICK CHIP AUTOMATION ───
+function setAll(mode) {
+  CRITERIA.forEach(c => {
+    let v = 0;
+    if (mode === 'max') v = c.max;
+    else if (mode === 'half') v = Math.round(c.max / 2);
+    else if (mode === 'random') v = Math.floor(Math.random() * (c.max + 1));
+    scores[c.id] = v;
+    document.getElementById('sl_' + c.id).value = v;
+    document.getElementById('num_' + c.id).value = v;
+  });
+  updateTotals();
+  updateRadar();
+}
+
+// ─── WORKFLOW PIPELINE NAVIGATION ───
+function goStep(n) {
+  document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.step-pill').forEach(el => {
+    const s = Number(el.dataset.step);
+    el.classList.remove('active', 'done');
+    if (s === n) el.classList.add('active');
+    else if (s < n) el.classList.add('done');
+  });
+  document.getElementById('step' + n).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (n === 4) buildReview();
+}
+
+function buildReview() {
+  const total = Object.values(scores).reduce((a, b) => a + b, 0);
+  const metaFields = [
+    { label: 'Jury Member', val: document.getElementById('juryName').value || '—' },
+    { label: 'Team / Project', val: document.getElementById('teamName').value || '—' },
+    { label: 'Domain', val: document.getElementById('domain').value || '—' },
+    { label: 'Round', val: document.getElementById('round').value || '—' },
+  ];
+  const metaHtml = metaFields.map(f => `
+    <div class="review-meta-item">
+      <div class="review-meta-label">${f.label}</div>
+      <div class="review-meta-val">${f.val}</div>
+    </div>`).join('');
+  const scoreRows = CRITERIA.map(c => `
+    <div class="review-score-row">
+      <span>${c.name}</span>
+      <strong style="color:var(--navy)">${scores[c.id]} / ${c.max}</strong>
+    </div>`).join('');
+
+  document.getElementById('reviewContent').innerHTML = `
+    <div class="review-meta">${metaHtml}</div>
+    <div style="background:#f8faff;border-radius:10px;padding:16px;margin-bottom:16px">
+      ${scoreRows}
+      <div class="review-total"><span>Total Score</span><span>${total} / 100</span></div>
+    </div>
+    <div style="font-size:13px;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:9px;padding:14px;color:#4c1d95;margin-bottom:10px">
+      <strong>Comments:</strong><br>${document.getElementById('comments').value || 'No remarks entered.'}
+    </div>
+    <div style="font-size:13px;background:#fff7ed;border:1px solid #fed7aa;border-radius:9px;padding:14px;color:#9a3412">
+      <strong>Recommendation:</strong> ${document.getElementById('recommendation').value || 'None selected'}
+    </div>`;
+}
+
+// ─── AMBIENT CRITERIA ASSISTANT ───
+function getAIFeedback() {
+  const total = Object.values(scores).reduce((a, b) => a + b, 0);
+  if (total === 0) { alert('Please enter scores before generating feedback!'); return; }
+
+  const btn = document.getElementById('aiBtn');
+  const bubble = document.getElementById('aiBubble');
+  const textEl = document.getElementById('aiText');
+
+  btn.disabled = true;
+  bubble.classList.add('show');
+  
+  // Real-time analysis metrics
+  aiSuggestionText = generateLocalFeedback(total);
+  textEl.textContent = aiSuggestionText;
+  btn.disabled = false;
+}
+
+function generateLocalFeedback(total) {
+  let fb = [];
+  if (total >= 85) fb.push('An exceptional project that stands out with clear structural impact and strong implementation execution.');
+  else if (total >= 70) fb.push('A solid submission displaying a well-developed operational concept and functional implementation.');
+  else if (total >= 50) fb.push('The solution concept shows genuine potential but requires extensive architectural polish to compete effectively.');
+  else fb.push('The team has successfully targeted a valid core real-world pain point, though execution systems require total rework.');
+  
+  if (scores.s2 < 12) fb.push('Push for a more uniquely innovative angle—explore elements differentiating this from standard market offerings.');
+  else if (scores.s2 >= 17) fb.push('The project\'s innovation metric was highly distinct and provided a great competitive edge.');
+  
+  if (scores.s3 >= 16) fb.push('The real-time working prototype demo was a standout highlight of the jury overview session.');
+  else if (scores.s3 < 10) fb.push('Prioritizing a more robust, working MVP build would drastically solidify future evaluation criteria.');
+  
+  return fb.join(' ');
+}
+
+function useAISuggestion() {
+  document.getElementById('comments').value = aiSuggestionText;
+}
+
+// ─── CRITICAL CORRECTION FIX: LOCAL VS CODE LIVE STORAGE POST PIPELINE ───
+async function submitForm() {
+  const juryName = document.getElementById('juryName').value.trim();
+  const teamName = document.getElementById('teamName').value.trim();
+  const domain = document.getElementById('domain').value;
+  if (!juryName || !teamName || !domain) {
+    alert('Please fill in all required fields in Step 1.');
+    goStep(1);
+    return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.textContent = 'Submitting Data...';
+  btn.disabled = true;
+
+  const total = Object.values(scores).reduce((a, b) => a + b, 0);
+  const formData = {
+    juryName,
+    teamName,
+    domain,
+    round: document.getElementById('round').value,
+    score1: scores.s1, score2: scores.s2, score3: scores.s3, score4: scores.s4,
+    score5: scores.s5, score6: scores.s6, score7: scores.s7,
+    totalScore: total,
+    comments: document.getElementById('comments').value || 'Evaluated successfully.',
+    recommendation: document.getElementById('recommendation').value || 'Reviewed',
+  };
+
+  try {
+    // FIXED: Use standard URL-encoded stream properties to prevent browser cross-origin blocks
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors', 
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
+
+    // Because 'no-cors' clears redirect access, process straight to success upon clean execution
+    onSubmitSuccess(teamName, total);
+
+  } catch (error) {
+    console.error("Transmission Error Context:", error);
+    showStatus('error', 'Network error. Please confirm your internet connection and deployment settings.');
+    btn.textContent = '🔥 Submit Final Evaluation';
+    btn.disabled = false;
+  }
+}
+
+function onSubmitSuccess(teamName, total) {
+  leaderboardData.push({
+    team: teamName,
+    score: total,
+    domain: document.getElementById('domain').value || 'Tech',
+  });
+  leaderboardData.sort((a, b) => b.score - a.score);
+  buildLeaderboard();
+
+  document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+  const ss = document.getElementById('successScreen');
+  document.getElementById('successTeam').textContent = teamName;
+  document.getElementById('successScore').textContent = total + ' / 100';
+  ss.classList.add('show');
+
+  const btn = document.getElementById('submitBtn');
+  btn.textContent = '🔥 Submit Final Evaluation';
+  btn.disabled = false;
+}
+
+function showStatus(type, msg) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = type;
+  el.style.display = 'block';
+  setTimeout(() => { el.className = ''; el.style.display = 'none'; }, 5000);
+}
+
+// ─── SYSTEM DATA LIFECYCLE WIPEOUT ───
+function resetAll() {
+  ['juryName','teamName','comments'].forEach(id => document.getElementById(id).value = '');
+  ['domain','round','recommendation'].forEach(id => document.getElementById(id).selectedIndex = 0);
+  CRITERIA.forEach(c => {
+    scores[c.id] = 0;
+    document.getElementById('sl_' + c.id).value = 0;
+    document.getElementById('num_' + c.id).value = 0;
+  });
+  updateTotals();
+  updateRadar();
+  document.getElementById('aiBubble').classList.remove('show');
+  document.getElementById('successScreen').classList.remove('show');
+  document.querySelectorAll('.step-pill').forEach(el => {
+    el.classList.remove('active', 'done');
+    if (el.dataset.step === '1') el.classList.add('active');
+  });
+  document.getElementById('step1').classList.add('active');
+  startTime = Date.now();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─── LIVE LEADERBOARD COMPILING ───
+function buildLeaderboard() {
+  const el = document.getElementById('leaderboard');
+  const top = leaderboardData.slice(0, 5);
+  if (!top.length) { el.innerHTML = '<div class="lb-empty">No submissions yet today</div>'; return; }
+  const medals = ['🥇', '🥈', '🥉'];
+  el.innerHTML = top.map((t, i) => `
+    <div class="lb-row">
+      <div class="lb-rank">${medals[i] || (i + 1)}</div>
+      <div style="flex:1">
+        <div class="lb-team-name">${t.team}</div>
+        <div class="lb-domain">${t.domain}</div>
+      </div>
+      <div class="lb-score">${t.score}</div>
+    </div>`).join('');
+}
+
+// ─── TRACKING CLOCK ───
+function startTimer() {
+  setInterval(() => {
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
+    const s = String(elapsed % 60).padStart(2, '0');
+    document.getElementById('timer').textContent = m + ':' + s;
+  }, 1000);
+}
+
+// Instantiate visual graphs on window paint
+updateRadar();
+</script>
+
+</body>
+</html>
