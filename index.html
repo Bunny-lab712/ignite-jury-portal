@@ -136,7 +136,7 @@
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
 
-    /* Domain Grid Multi-Select Checkboxes */
+    /* Scrollable Domain Grid Multi-Select Checkboxes */
     .domain-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -145,7 +145,7 @@
       padding: 16px;
       border: 1.5px solid var(--border);
       border-radius: var(--radius-sm);
-      max-height: 320px;
+      max-height: 260px;
       overflow-y: auto;
     }
     .domain-item {
@@ -452,7 +452,7 @@
         </div>
       </div>
 
-      <div class="btn-row" style="margin-top: 24px;">
+      <div class="btn-row" style="margin-top: 28px;">
         <button class="btn btn-outline btn-sm" onclick="goStep(2)">← Back</button>
         <button class="btn btn-navy" style="flex:1" onclick="goStep(4)">Next: Review & Submit →</button>
       </div>
@@ -814,7 +814,7 @@ async function submitForm() {
     score5: scores.s5, score6: scores.s6, score7: scores.s7,
     totalScore: total,
     comments: document.getElementById('comments').value || 'Evaluated successfully.',
-    recommendation: "Reviewed" // Normalized background placeholder string string fallback
+    recommendation: "Reviewed" 
   };
 
   try {
