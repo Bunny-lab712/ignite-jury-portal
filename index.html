@@ -136,6 +136,38 @@
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
 
+    /* Expanded Domain Grid Multi-Select Checkboxes */
+    .domain-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
+      background: #f8fafc;
+      padding: 16px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      max-height: 320px;
+      overflow-y: auto;
+    }
+    .domain-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #374151;
+      cursor: pointer;
+      padding: 4px 0;
+    }
+    .domain-item:hover {
+      color: var(--navy);
+    }
+    .domain-item input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: var(--navy);
+    }
+
     /* ─── SCORING ROWS ─── */
     .quick-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
     .qa-chip {
@@ -177,6 +209,11 @@
     }
 
     /* ─── TOTAL BOX ─── */
+    .total-panel {
+      background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+      border-radius: 14px; padding: 22px;
+      text-align: center; margin-top: 26px;
+    }
     .total-panel {
       background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
       border-radius: 14px; padding: 22px;
@@ -287,11 +324,10 @@
     .lb-row:hover { background: #eff6ff; border-color: #93c5fd; transform: translateX(3px); }
     .lb-rank { font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 800; width: 26px; text-align: center; }
     .lb-team-name { font-size: 13px; font-weight: 600; }
-    .lb-domain { font-size: 11px; color: var(--muted); }
+    .lb-domain { font-size: 11px; color: var(--muted); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 150px; }
     .lb-score { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 800; color: var(--navy); margin-left: auto; }
     .lb-empty { font-size: 12px; color: var(--muted); text-align: center; padding: 12px; }
 
-    /* Sponsors */
     .sponsor-card {
       background: #fff; border: 1px solid var(--border); border-radius: 10px;
       padding: 12px 14px; display: flex; align-items: center; gap: 12px;
@@ -330,37 +366,47 @@
 
     <div class="step-content active card" id="step1">
       <div class="section-label">Step 1 — Team Information</div>
-      <div class="grid-2">
-        <div class="field">
-          <label for="juryName">Jury Member Name</label>
-          <input type="text" id="juryName" placeholder="Your full name" required>
-        </div>
-        <div class="field">
-          <label for="teamName">Team ID / Project Name</label>
-          <input type="text" id="teamName" placeholder="e.g., Team Alpha" required>
-        </div>
-        <div class="field">
-          <label for="domain">Project Domain</label>
-          <select id="domain" required>
-            <option value="">Select Domain...</option>
-            <option value="Web/App Development">Web / App Development</option>
-            <option value="AI / Machine Learning">AI / Machine Learning</option>
-            <option value="IoT / Hardware">IoT / Hardware</option>
-            <option value="Cybersecurity">Cybersecurity</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="round">Evaluation Round</label>
-          <select id="round">
-            <option value="Round 1">Round 1 — Preliminary</option>
-            <option value="Round 2">Round 2 — Semi-Final</option>
-            <option value="Finals">Finals</option>
-          </select>
+      
+      <div class="field">
+        <label for="juryName">Jury Member Name</label>
+        <input type="text" id="juryName" placeholder="Your full name" required>
+      </div>
+      
+      <div class="field">
+        <label for="teamName">Team ID / Project Name</label>
+        <input type="text" id="teamName" placeholder="e.g., Team Alpha" required>
+      </div>
+      
+      <div class="field">
+        <label>Project Domains (Select all applicable options)</label>
+        <div class="domain-grid">
+          <label class="domain-item"><input type="checkbox" name="domainOpt" value="Artificial Intelligence (AI)"> Artificial Intelligence (AI)</label>
+          <label class="domain-item"><input type="checkbox" name="domainOpt" value="Machine Learning (ML)"> Machine Learning (ML)</label>
+          <label class="domain-item"><input type="checkbox" name="domainOpt" value="Deep Learning (DL)"> Deep Learning (DL)</label>
+          <label class="domain-item"><input type="checkbox" name="domainOpt" value="Computer Vision"> Computer Vision</label>
+          <label class="domain-item"><input type="checkbox" name="domainOpt" value="Natural Language Processing (NLP)"> Natural Language Processing (NLP)</label>
+          <label class="domain-item"><input type="checkbox" name="domainOpt" value="Web Development"> Web Development</label>
+          <label class="domain-item"><input type="checkbox" name="domainOpt" value="Mobile App Development"> Mobile App Development</label>
+          <label class="domain-item"><input type="checkbox" name="domainOpt" value="Cybersecurity"> Cybersecurity</label>
+          <label class="domain-item"><input type="checkbox" name="domainOpt" value="Internet of Things (IoT)"> Internet of Things (IoT)</label>
+          <label class="domain-item"><input type="checkbox" name="domainOpt" value="Blockchain & Web3"> Blockchain & Web3</label>
+          <label class="domain-item"><input type="checkbox" name="domainOpt" value="Cloud Computing"> Cloud Computing</label>
+          <label class="domain-item"><input type="checkbox" name="domainOpt" value="Data Science & Analytics"> Data Science & Analytics</label>
+          <label class="domain-item"><input type="checkbox" name="domainOpt" value="UI/UX Design"> UI/UX Design</label>
+          <label class="domain-item"><input type="checkbox" name="domainOpt" value="AR/VR"> AR/VR</label>
+          <label class="domain-item"><input type="checkbox" name="domainOpt" value="Robotics & Automation"> Robotics & Automation</label>
+          <label class="domain-item"><input type="checkbox" name="domainOpt" value="Embedded Systems"> Embedded Systems</label>
+          <label class="domain-item"><input type="checkbox" name="domainOpt" value="DevOps"> DevOps</label>
+          <label class="domain-item"><input type="checkbox" name="domainOpt" value="Game Development"> Game Development</label>
+          <label class="domain-item"><input type="checkbox" name="domainOpt" value="Generative AI"> Generative AI</label>
+          <label class="domain-item"><input type="checkbox" name="domainOpt" value="App development"> App development</label>
+          <label class="domain-item"><input type="checkbox" name="domainOpt" value="Web development"> Web development</label>
+          <label class="domain-item"><input type="checkbox" name="domainOpt" value="Other"> Other</label>
         </div>
       </div>
+
       <div class="btn-row">
-        <button class="btn btn-navy btn-block" onclick="goStep(2)">Next: Scoring →</button>
+        <button class="btn btn-navy btn-block" onclick="validateStep1() ? goStep(2) : null">Next: Scoring →</button>
       </div>
     </div>
 
@@ -504,7 +550,6 @@
 
     </div>
   </aside>
-
 </div>
 
 <script>
@@ -525,7 +570,7 @@ const SPONSORS = [
   { name: 'ESSENSHINE',                 loc: 'Hyderabad',       abbr: 'ES' },
   { name: 'Auroversity Technologies',   loc: 'Madurai',         abbr: 'AV' },
   { name: 'Jeevan Voluntary Blood Bank',loc: 'Hanamkonda',      abbr: 'JB' },
-  { name: 'ReSearchRS',                 loc: 'New Delhi',       abbr: 'RS' },
+  { name: 'reSearchHRs',                loc: 'New Delhi',       abbr: 'RH' },
 ];
 
 let scores = {};
@@ -534,7 +579,6 @@ let startTime = Date.now();
 let leaderboardData = [];
 let aiSuggestionText = '';
 
-// Updated Live API Target Link
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbza6NPd67onaLZLVzo1MAn66aKwog3cMAxJziifP9kLp6hADtMTDj4IAEda60ANebU1OQ/exec';
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
@@ -547,6 +591,7 @@ startTimer();
 
 function buildSponsorList() {
   const el = document.getElementById('sponsorList');
+  el.innerHTML = '';
   SPONSORS.forEach(s => {
     el.innerHTML += `
       <div class="sponsor-card">
@@ -592,7 +637,31 @@ function buildMiniScores() {
   });
 }
 
-// ─── SCORE INPUT & LIVE LIMIT RESTRICTIONS ───
+// Compile all checked domain variations cleanly
+function getSelectedDomains() {
+  const checked = document.querySelectorAll('input[name="domainOpt"]:checked');
+  let values = [];
+  checked.forEach(cb => values.push(cb.value));
+  return values.length > 0 ? values.join(', ') : 'None Selected';
+}
+
+function validateStep1() {
+  const jury = document.getElementById('juryName').value.trim();
+  const team = document.getElementById('teamName').value.trim();
+  const checkedCount = document.querySelectorAll('input[name="domainOpt"]:checked').length;
+  
+  if (!jury || !team) {
+    alert('Please provide both Jury Name and Team ID.');
+    return false;
+  }
+  if (checkedCount === 0) {
+    alert('Please select at least one Project Domain.');
+    return false;
+  }
+  return true;
+}
+
+// ─── SCORE INPUT ───
 function onScore(id, raw, src) {
   const max = CRITERIA.find(c => c.id === id).max;
   let v = Math.min(Math.max(Math.round(Number(raw) || 0), 0), max);
@@ -662,7 +731,7 @@ function updateRadar() {
   }
 }
 
-// ─── QUICK CHIP AUTOMATION ───
+// ─── QUICK CHIP SCORING AUTOMATION ───
 function setAll(mode) {
   CRITERIA.forEach(c => {
     let v = 0;
@@ -677,7 +746,7 @@ function setAll(mode) {
   updateRadar();
 }
 
-// ─── WORKFLOW PIPELINE NAVIGATION ───
+// ─── PIPELINE STEP SELECTION NAVIGATION ───
 function goStep(n) {
   document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.step-pill').forEach(el => {
@@ -696,8 +765,7 @@ function buildReview() {
   const metaFields = [
     { label: 'Jury Member', val: document.getElementById('juryName').value || '—' },
     { label: 'Team / Project', val: document.getElementById('teamName').value || '—' },
-    { label: 'Domain', val: document.getElementById('domain').value || '—' },
-    { label: 'Round', val: document.getElementById('round').value || '—' },
+    { label: 'Domain(s)', val: getSelectedDomains() }
   ];
   const metaHtml = metaFields.map(f => `
     <div class="review-meta-item">
@@ -724,7 +792,7 @@ function buildReview() {
     </div>`;
 }
 
-// ─── AMBIENT CRITERIA ASSISTANT ───
+// ─── LOCAL ANALYSIS ENGINE ───
 function getAIFeedback() {
   const total = Object.values(scores).reduce((a, b) => a + b, 0);
   if (total === 0) { alert('Please enter scores before generating feedback!'); return; }
@@ -736,7 +804,6 @@ function getAIFeedback() {
   btn.disabled = true;
   bubble.classList.add('show');
   
-  // Real-time analysis metrics
   aiSuggestionText = generateLocalFeedback(total);
   textEl.textContent = aiSuggestionText;
   btn.disabled = false;
@@ -762,16 +829,11 @@ function useAISuggestion() {
   document.getElementById('comments').value = aiSuggestionText;
 }
 
-// ─── CRITICAL CORRECTION FIX: LOCAL VS CODE LIVE STORAGE POST PIPELINE ───
+// ─── DATA STREAM TRANSMISSION ───
 async function submitForm() {
   const juryName = document.getElementById('juryName').value.trim();
   const teamName = document.getElementById('teamName').value.trim();
-  const domain = document.getElementById('domain').value;
-  if (!juryName || !teamName || !domain) {
-    alert('Please fill in all required fields in Step 1.');
-    goStep(1);
-    return;
-  }
+  const domain = getSelectedDomains();
 
   const btn = document.getElementById('submitBtn');
   btn.textContent = 'Submitting Data...';
@@ -782,7 +844,7 @@ async function submitForm() {
     juryName,
     teamName,
     domain,
-    round: document.getElementById('round').value,
+    round: "Single Round Evaluation", // Static placeholder for sheet column integrity
     score1: scores.s1, score2: scores.s2, score3: scores.s3, score4: scores.s4,
     score5: scores.s5, score6: scores.s6, score7: scores.s7,
     totalScore: total,
@@ -791,7 +853,6 @@ async function submitForm() {
   };
 
   try {
-    // FIXED: Use standard URL-encoded stream properties to prevent browser cross-origin blocks
     await fetch(GOOGLE_SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors', 
@@ -799,7 +860,6 @@ async function submitForm() {
       body: JSON.stringify(formData),
     });
 
-    // Because 'no-cors' clears redirect access, process straight to success upon clean execution
     onSubmitSuccess(teamName, total);
 
   } catch (error) {
@@ -814,7 +874,7 @@ function onSubmitSuccess(teamName, total) {
   leaderboardData.push({
     team: teamName,
     score: total,
-    domain: document.getElementById('domain').value || 'Tech',
+    domain: getSelectedDomains(),
   });
   leaderboardData.sort((a, b) => b.score - a.score);
   buildLeaderboard();
@@ -838,10 +898,15 @@ function showStatus(type, msg) {
   setTimeout(() => { el.className = ''; el.style.display = 'none'; }, 5000);
 }
 
-// ─── SYSTEM DATA LIFECYCLE WIPEOUT ───
+// ─── CONTEXT LIFECYCLE REBOOT ───
 function resetAll() {
   ['juryName','teamName','comments'].forEach(id => document.getElementById(id).value = '');
-  ['domain','round','recommendation'].forEach(id => document.getElementById(id).selectedIndex = 0);
+  ['recommendation'].forEach(id => document.getElementById(id).selectedIndex = 0);
+  
+  // Uncheck all domains
+  const checkboxes = document.querySelectorAll('input[name="domainOpt"]');
+  checkboxes.forEach(cb => cb.checked = false);
+
   CRITERIA.forEach(c => {
     scores[c.id] = 0;
     document.getElementById('sl_' + c.id).value = 0;
@@ -860,7 +925,7 @@ function resetAll() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ─── LIVE LEADERBOARD COMPILING ───
+// ─── LEADERBOARD RENDERER ───
 function buildLeaderboard() {
   const el = document.getElementById('leaderboard');
   const top = leaderboardData.slice(0, 5);
@@ -869,15 +934,15 @@ function buildLeaderboard() {
   el.innerHTML = top.map((t, i) => `
     <div class="lb-row">
       <div class="lb-rank">${medals[i] || (i + 1)}</div>
-      <div style="flex:1">
+      <div style="flex:1; min-width: 0;">
         <div class="lb-team-name">${t.team}</div>
-        <div class="lb-domain">${t.domain}</div>
+        <div class="lb-domain" title="${t.domain}">${t.domain}</div>
       </div>
       <div class="lb-score">${t.score}</div>
     </div>`).join('');
 }
 
-// ─── TRACKING CLOCK ───
+// ─── CLOCK RUNNER ───
 function startTimer() {
   setInterval(() => {
     const elapsed = Math.floor((Date.now() - startTime) / 1000);
