@@ -136,7 +136,7 @@
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
 
-    /* Expanded Domain Grid Multi-Select Checkboxes */
+    /* Domain Grid Multi-Select Checkboxes */
     .domain-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -209,11 +209,6 @@
     }
 
     /* ─── TOTAL BOX ─── */
-    .total-panel {
-      background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-      border-radius: 14px; padding: 22px;
-      text-align: center; margin-top: 26px;
-    }
     .total-panel {
       background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
       border-radius: 14px; padding: 22px;
@@ -327,21 +322,6 @@
     .lb-domain { font-size: 11px; color: var(--muted); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 150px; }
     .lb-score { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 800; color: var(--navy); margin-left: auto; }
     .lb-empty { font-size: 12px; color: var(--muted); text-align: center; padding: 12px; }
-
-    .sponsor-card {
-      background: #fff; border: 1px solid var(--border); border-radius: 10px;
-      padding: 12px 14px; display: flex; align-items: center; gap: 12px;
-      transition: var(--transition); margin-bottom: 8px;
-    }
-    .sponsor-card:hover { border-color: #93c5fd; transform: translateX(4px); box-shadow: 0 4px 12px rgba(9,19,83,.07); }
-    .sponsor-dot {
-      width: 38px; height: 38px; border-radius: 9px;
-      background: linear-gradient(135deg, #e8edf8, #dbeafe);
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Sora', sans-serif; font-size: 12px; font-weight: 800; color: var(--navy); flex-shrink: 0;
-    }
-    .sponsor-name { font-size: 13px; font-weight: 700; color: var(--navy); }
-    .sponsor-loc { font-size: 11px; color: var(--red); margin-top: 2px; }
   </style>
 </head>
 <body>
@@ -448,7 +428,7 @@
     </div>
 
     <div class="step-content card" id="step3">
-      <div class="section-label">Step 3 — Remarks & Recommendation</div>
+      <div class="section-label">Step 3 — Remarks & Feedback</div>
 
       <div class="field">
         <label for="comments">Jury Comments & Feedback</label>
@@ -472,18 +452,7 @@
         </div>
       </div>
 
-      <div class="field" style="margin-top:24px">
-        <label for="recommendation">Jury Recommendation</label>
-        <select id="recommendation">
-          <option value="">Select a recommendation...</option>
-          <option value="Strongly Recommend for Finals">⭐ Strongly Recommend for Finals</option>
-          <option value="Recommend with minor improvements">✅ Recommend with Minor Improvements</option>
-          <option value="Needs significant rework">⚠️ Needs Significant Rework</option>
-          <option value="Not recommended">❌ Not Recommended</option>
-        </select>
-      </div>
-
-      <div class="btn-row">
+      <div class="btn-row" style="margin-top: 24px;">
         <button class="btn btn-outline btn-sm" onclick="goStep(2)">← Back</button>
         <button class="btn btn-navy" style="flex:1" onclick="goStep(4)">Next: Review & Submit →</button>
       </div>
@@ -637,7 +606,6 @@ function buildMiniScores() {
   });
 }
 
-// Compile all checked domain variations cleanly
 function getSelectedDomains() {
   const checked = document.querySelectorAll('input[name="domainOpt"]:checked');
   let values = [];
@@ -731,7 +699,7 @@ function updateRadar() {
   }
 }
 
-// ─── QUICK CHIP SCORING AUTOMATION ───
+// ─── QUICK CHIP AUTOMATION ───
 function setAll(mode) {
   CRITERIA.forEach(c => {
     let v = 0;
@@ -746,7 +714,7 @@ function setAll(mode) {
   updateRadar();
 }
 
-// ─── PIPELINE STEP SELECTION NAVIGATION ───
+// ─── WORKFLOW PIPELINE NAVIGATION ───
 function goStep(n) {
   document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.step-pill').forEach(el => {
@@ -784,15 +752,12 @@ function buildReview() {
       ${scoreRows}
       <div class="review-total"><span>Total Score</span><span>${total} / 100</span></div>
     </div>
-    <div style="font-size:13px;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:9px;padding:14px;color:#4c1d95;margin-bottom:10px">
+    <div style="font-size:13px;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:9px;padding:14px;color:#4c1d95;">
       <strong>Comments:</strong><br>${document.getElementById('comments').value || 'No remarks entered.'}
-    </div>
-    <div style="font-size:13px;background:#fff7ed;border:1px solid #fed7aa;border-radius:9px;padding:14px;color:#9a3412">
-      <strong>Recommendation:</strong> ${document.getElementById('recommendation').value || 'None selected'}
     </div>`;
 }
 
-// ─── LOCAL ANALYSIS ENGINE ───
+// ─── AMBIENT CRITERIA ASSISTANT ───
 function getAIFeedback() {
   const total = Object.values(scores).reduce((a, b) => a + b, 0);
   if (total === 0) { alert('Please enter scores before generating feedback!'); return; }
@@ -844,12 +809,12 @@ async function submitForm() {
     juryName,
     teamName,
     domain,
-    round: "Single Round Evaluation", // Static placeholder for sheet column integrity
+    round: "Single Round Evaluation",
     score1: scores.s1, score2: scores.s2, score3: scores.s3, score4: scores.s4,
     score5: scores.s5, score6: scores.s6, score7: scores.s7,
     totalScore: total,
     comments: document.getElementById('comments').value || 'Evaluated successfully.',
-    recommendation: document.getElementById('recommendation').value || 'Reviewed',
+    recommendation: "Reviewed" // Normalized background placeholder string string fallback
   };
 
   try {
@@ -898,10 +863,9 @@ function showStatus(type, msg) {
   setTimeout(() => { el.className = ''; el.style.display = 'none'; }, 5000);
 }
 
-// ─── CONTEXT LIFECYCLE REBOOT ───
+// ─── SYSTEM CONTEXT LIFE CYCLE RESET ───
 function resetAll() {
   ['juryName','teamName','comments'].forEach(id => document.getElementById(id).value = '');
-  ['recommendation'].forEach(id => document.getElementById(id).selectedIndex = 0);
   
   // Uncheck all domains
   const checkboxes = document.querySelectorAll('input[name="domainOpt"]');
@@ -942,7 +906,7 @@ function buildLeaderboard() {
     </div>`).join('');
 }
 
-// ─── CLOCK RUNNER ───
+// ─── TIMER ───
 function startTimer() {
   setInterval(() => {
     const elapsed = Math.floor((Date.now() - startTime) / 1000);
